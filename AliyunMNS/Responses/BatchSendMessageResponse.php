@@ -18,7 +18,7 @@ class BatchSendMessageResponse extends BaseResponse
 
     public function __construct()
     {
-        $this->sendMessageResponseItems = array();
+        $this->sendMessageResponseItems = [];
     }
 
     public function getSendMessageResponseItems()
@@ -30,7 +30,7 @@ class BatchSendMessageResponse extends BaseResponse
     {
         $this->statusCode = $statusCode;
         if ($statusCode == 201) {
-            $this->succeed = TRUE;
+            $this->succeed = true;
         } else {
             $this->parseErrorResponse($statusCode, $content);
         }
@@ -38,8 +38,7 @@ class BatchSendMessageResponse extends BaseResponse
         $xmlReader = $this->loadXmlContent($content);
 
         try {
-            while ($xmlReader->read())
-            {
+            while ($xmlReader->read()) {
                 if ($xmlReader->nodeType == \XMLReader::ELEMENT && $xmlReader->name == 'Message') {
                     $this->sendMessageResponseItems[] = SendMessageResponseItem::fromXML($xmlReader);
                 }
@@ -51,29 +50,28 @@ class BatchSendMessageResponse extends BaseResponse
         }
     }
 
-    public function parseErrorResponse($statusCode, $content, MnsException $exception = NULL)
+    public function parseErrorResponse($statusCode, $content, MnsException $exception = null)
     {
-        $this->succeed = FALSE;
-        $xmlReader = $this->loadXmlContent($content);
+        $this->succeed = false;
+        $xmlReader     = $this->loadXmlContent($content);
 
         try {
-            while ($xmlReader->read())
-            {
+            while ($xmlReader->read()) {
                 if ($xmlReader->nodeType == \XMLReader::ELEMENT) {
                     switch ($xmlReader->name) {
-                    case Constants::ERROR:
-                        $this->parseNormalErrorResponse($xmlReader);
-                        break;
-                    default: // case Constants::Messages
-                        $this->parseBatchSendErrorResponse($xmlReader);
-                        break;
+                        case Constants::ERROR:
+                            $this->parseNormalErrorResponse($xmlReader, $statusCode, $exception);
+                            break;
+                        default: // case Constants::Messages
+                            $this->parseBatchSendErrorResponse($xmlReader);
+                            break;
                     }
                 }
             }
         } catch (\Exception $e) {
-            if ($exception != NULL) {
+            if ($exception != null) {
                 throw $exception;
-            } elseif($e instanceof MnsException) {
+            } else if ($e instanceof MnsException) {
                 throw $e;
             } else {
                 throw new MnsException($statusCode, $e->getMessage());
@@ -86,28 +84,25 @@ class BatchSendMessageResponse extends BaseResponse
     private function parseBatchSendErrorResponse($xmlReader)
     {
         $ex = new BatchSendFailException($this->statusCode, "BatchSendMessage Failed For Some Messages");
-        while ($xmlReader->read())
-        {
+        while ($xmlReader->read()) {
             if ($xmlReader->nodeType == \XMLReader::ELEMENT && $xmlReader->name == 'Message') {
-                $ex->addSendMessageResponseItem( SendMessageResponseItem::fromXML($xmlReader));
+                $ex->addSendMessageResponseItem(SendMessageResponseItem::fromXML($xmlReader));
             }
         }
         throw $ex;
     }
 
-    private function parseNormalErrorResponse($xmlReader)
+
+    private function parseNormalErrorResponse($xmlReader, $statusCode, $exception = null)
     {
         $result = XMLParser::parseNormalError($xmlReader);
-        if ($result['Code'] == Constants::QUEUE_NOT_EXIST)
-        {
+        if ($result['Code'] == Constants::QUEUE_NOT_EXIST) {
             throw new QueueNotExistException($statusCode, $result['Message'], $exception, $result['Code'], $result['RequestId'], $result['HostId']);
         }
-        if ($result['Code'] == Constants::INVALID_ARGUMENT)
-        {
+        if ($result['Code'] == Constants::INVALID_ARGUMENT) {
             throw new InvalidArgumentException($statusCode, $result['Message'], $exception, $result['Code'], $result['RequestId'], $result['HostId']);
         }
-        if ($result['Code'] == Constants::MALFORMED_XML)
-        {
+        if ($result['Code'] == Constants::MALFORMED_XML) {
             throw new MalformedXMLException($statusCode, $result['Message'], $exception, $result['Code'], $result['RequestId'], $result['HostId']);
         }
         throw new MnsException($statusCode, $result['Message'], $exception, $result['Code'], $result['RequestId'], $result['HostId']);
