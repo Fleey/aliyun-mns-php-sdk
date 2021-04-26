@@ -1,5 +1,7 @@
 # MNS SDK for PHP    
 
+> 此包来由：因为aliyun那边已经没有人维护mns sdk php 包，所以只能够自行维护。如您有发现任何此包 bug 均可提交pull request 进行合并修复。
+
 Aliyun MNS Documents: https://www.aliyun.com/product/mns
 
 Aliyun MNS Console: https://mns.console.aliyun.com
@@ -18,7 +20,7 @@ Add require to your `composer.json`
 ```json
 {
   "require": {
-     "aliyun/aliyun-mns-php-sdk": ">=1.0.0"
+     "fleey/aliyun-mns-php-sdk": ">=1.0.0"
   }
 }
 ```
