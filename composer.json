@@ -1,12 +1,12 @@
 {
-    "name": "aliyun/aliyun-mns-php-sdk",
+    "name": "fleey/aliyun-mns-php-sdk",
     "type": "library",
-    "description": "Aliyun Message and Notification Service SDK for PHP, PHP>=5.5.0",
-    "keywords": ["Aliyun", "mns", "MNS", "Message", "Message Service", "Notification"],
+    "description": "Aliyun Message and Notification Service SDK for PHP, fleey fix version.",
+    "keywords": ["Aliyun", "mns", "MNS", "Message", "Message Service", "Notification","Fleey"],
     "homepage": "https://github.com/aliyun/aliyun-mns-php-sdk",
     "license": "MIT",
     "authors" : [{
-		"name" : "Aliyun MNS Team",
+		"name" : "Aliyun MNS Team and Fleey",
 		"homepage" : "http://www.aliyun.com/product/mns"
 	}],
     "require": {
